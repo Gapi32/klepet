@@ -105,6 +105,17 @@ $(document).ready(function() {
     socket.emit('kanali');
     socket.emit('uporabniki', {kanal: trenutniKanal});
   }, 1000);
+  
+  socket.on('dregljaj', function(dregljaj) {
+    var shake = dregljaj.dregljaj;
+    if (shake) {
+      $('#vsebina').jrumble();
+      $('#vsebina').trigger('startRumble');
+      setTimeout(function() {
+        $('#vsebina').trigger('stopRumble');
+      }, 1000);
+    }
+  });
 
   $('#poslji-sporocilo').focus();
 
