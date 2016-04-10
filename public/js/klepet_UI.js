@@ -1,8 +1,10 @@
 function divElementEnostavniTekst(sporocilo) {
   var jeSmesko = sporocilo.indexOf('http://sandbox.lavbic.net/teaching/OIS/gradivo/') > -1;
   var jeSlika = sporocilo.indexOf('"class="picture" />') > -1;
-  if (jeSmesko || jeSlika) {
-    sporocilo = sporocilo.replace(/\</g, '&lt;').replace(/\>/g, '&gt;').replace('&lt;img', '<img').replace('png\' /&gt;', 'png\' />').replace(/"class="picture" \/&gt;/gi, '"class="picture" />').replace(/&lt;br&gt;&lt;img src="/gi, '<br><img src="');
+  var jeVideo = sporocilo.indexOf('<iframe src="https://www.youtube.com/embed/') > -1;
+  if (jeSmesko || jeSlika || jeVideo) {
+    sporocilo = sporocilo.replace(/\</g, '&lt;').replace(/\>/g, '&gt;').replace('&lt;img', '<img').replace('png\' /&gt;', 'png\' />').replace(/"class="picture" \/&gt;/gi, '"class="picture" />').replace(/&lt;br&gt;&lt;img src="/gi, '<br><img src="').replace(/&lt;iframe src="https:\/\/www.youtube.com\/embed\//gi, '<br><iframe src="https://www.youtube.com/embed/').replace(/" allowfullscreen&gt;&lt;\/iframe&gt;/gi, '" allowfullscreen></iframe>');
+
     return $('<div style="font-weight: bold"></div>').html(sporocilo);
   } else {
     return $('<div style="font-weight: bold;"></div>').text(sporocilo);
@@ -17,6 +19,8 @@ function procesirajVnosUporabnika(klepetApp, socket) {
   var sporocilo = $('#poslji-sporocilo').val();
   sporocilo = dodajSmeske(sporocilo);
   sporocilo += dodajSlike(sporocilo);
+  sporocilo += dodajVideo(sporocilo);
+
   var sistemskoSporocilo;
 
   if (sporocilo.charAt(0) == '/') {
@@ -148,4 +152,15 @@ function dodajSlike(besedilo){
     '"class="picture" />';
   }
   return dodaneSlike;
+}
+
+function dodajVideo(besedilo){
+  var video = besedilo.match(new RegExp("\\bhttps:\/\/www.youtube.com\/watch\\?v\=.+?(?=\\b)", 'gi'));
+  var dodanVideo = "";
+  
+  for(var x in video){
+    dodanVideo += " " + (video[x].replace(new RegExp(".*=(.+?(?=\\b))", 'gi'), '<iframe src="https://www.youtube.com/embed/$1" allowfullscreen></iframe>'));
+  }
+  
+  return dodanVideo;
 }
